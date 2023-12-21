@@ -1,0 +1,23 @@
+.body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 56, 79, 0.821);
+    width: 100vw;
+    height: 100vh;
+}
+
+.container{
+    display: flex;
+    gap: 1rem;
+}
+i{
+    border-radius: 1rem;
+    background-color: rgb(209, 206, 206);
+    font-size: 15rem;
+    color: rgb(14, 14, 67);
+    cursor: pointer;
+}
+i:hover{
+    transform: scale(1.1);
+}

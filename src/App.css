@@ -1,0 +1,49 @@
+body {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+}
+.boardContainer {
+  display: flex;
+  flex-direction: column;
+}
+.row {
+  display: flex;
+}
+
+.cell {
+  width: 70px;
+  height: 70px;
+  
+  border: 1px solid black;
+}
+
+.topStroke{
+    border-top: 3px solid black;
+}
+
+.leftStroke{
+    border-left: 3px solid black;
+}
+.input{
+    background-color: rgb(209, 209, 209);
+    width: 100%;
+    height: 100%;
+    outline: none;
+    font-size: 2.5rem;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: black;
+}
+
+.right{
+    color: green;
+}
+.wrong{
+    color: red;
+}
