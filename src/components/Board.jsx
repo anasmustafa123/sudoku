@@ -1,15 +1,33 @@
 import "../styles/board.css";
+import { Cell, solveSudoku } from "../code/game";
+import { useEffect, useState } from "react";
 
-function Board({ setShownPage, board, setBoard }) {
-  function deepCopy(originalArray) {
+function Board({ setShownPage }) {
+  const [isSolving, setIsSolving] = useState(-1);
+  const [solution, setSolution] = useState(null);
+  const [board, setBoard] = useState(() => {
     let copy = Array.from({ length: 9 }, () => Array(9).fill(new Cell()));
-    originalArray.map((row, rowIndex) => {
-      row.map((singleCell, colIndex) => {
+    copy = deepCopy(copy);
+    copy[0][0].value = 5;
+    copy[0][1].value = 4;
+    copy[0][7].value = 3;
+    copy[5][5].value = 4;
+    copy[8][8].value = 8;
+    return copy;
+  });
+
+  function deepCopy(originalArray) {
+    let copy = Array.from({ length: 9 }, () => Array(9).fill(null));
+    originalArray.forEach((row, rowIndex) => {
+      row.forEach((singleCell, colIndex) => {
+        // Create a new instance of the 'Cell' class for each cell in the array
+        copy[rowIndex][colIndex] = new Cell();
         copy[rowIndex][colIndex].value = singleCell.value;
       });
     });
     return copy;
   }
+
   const changeBoard = (e, row, col) => {
     let copyArray = deepCopy(board);
     let { name, value } = e.target;
@@ -21,6 +39,27 @@ function Board({ setShownPage, board, setBoard }) {
     //setBoard(board);
     //}
   };
+
+  useEffect(() => {
+    console.log("solving");
+    if (solution == null) {
+      let resultBoard = deepCopy(board);
+      console.log(resultBoard)
+      solveSudoku(resultBoard);
+      setSolution(resultBoard);
+    }
+    let copyBoard = deepCopy(board);
+    //15 ---> row: 1,  col:6
+    let i = parseInt(isSolving / 9);
+    let j = parseInt(isSolving % 9);
+    console.log(` solution:  ${solution}`);
+    if (solution != null) {
+      copyBoard[i][j].value = solution[i][j].value;
+      console.log(copyBoard);
+      setBoard(copyBoard);
+    }
+  }, [isSolving]);
+
   return (
     <>
       <div onClick={() => setShownPage(0)} className="returnBtn">
@@ -35,7 +74,7 @@ function Board({ setShownPage, board, setBoard }) {
             }`}
           >
             {row.map((cell, colIndex) => (
-              <div      
+              <div
                 key={colIndex}
                 className={`cell ${
                   colIndex == 3 || colIndex == 6 ? "leftStroke" : ""
@@ -59,7 +98,14 @@ function Board({ setShownPage, board, setBoard }) {
           </div>
         ))}
         <div className="play_container">
-          <div className="nextMove">
+          <div
+            onClick={() => {
+              if (isSolving < 80) {
+                setIsSolving(isSolving + 1);
+              }
+            }}
+            className="nextMove"
+          >
             <i className="bx bxs-right-arrow-alt"></i>
           </div>
           <div className="arcConsistency">
@@ -68,6 +114,6 @@ function Board({ setShownPage, board, setBoard }) {
         </div>
       </div>
     </>
-  ); 
+  );
 }
 export default Board;

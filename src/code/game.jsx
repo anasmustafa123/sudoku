@@ -3,8 +3,8 @@ class Cell {
   constructor() {
     this.possibleValues = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     this.value = 0;
-  } 
-}  
+  }
+}
 let initializeBoard = (rows, cols) => {
   let board = [];
   for (let i = 0; i < rows; i++) {
@@ -29,26 +29,27 @@ const displayBoard = (board) => {
   }
   console.log("__________________________________________________________");
 };
-  
+
 // The rest of your code remains unchanged
-const isSafe =  (board, row, col, num) => {
+const isSafe = (board, row, col, num) => {
   return (
-    ! usedInBox(board, row, col, num) &&
-    ! usedInRow(board, row, num) &&
-    ! usedInCol(board, col, num)
+    !usedInBox(board, row, col, num) &&
+    !usedInRow(board, row, num) &&
+    !usedInCol(board, col, num)
   );
 };
-const usedInCol =  (board, col, num) => {
+const usedInCol = (board, col, num) => {
   for (let i = 0; i < 9; i++) {
     if (board[i][col].value == num) return true;
   }
 };
-const usedInRow =  (board, row, num) => {
+const usedInRow = (board, row, num) => {
   for (let i = 0; i < 9; i++) {
     if (board[row][i].value == num) return true;
   }
 };
-const usedInBox =  (board, row, col, num) => {
+
+const usedInBox = (board, row, col, num) => {
   let boxRow = Math.floor(row / 3) * 3;
   let boxCol = Math.floor(col / 3) * 3;
   for (let i = boxRow; i < boxRow + 3; i++) {
@@ -57,7 +58,7 @@ const usedInBox =  (board, row, col, num) => {
     }
   }
 };
-const findEmptyLocation =  (board, emptyCell) => {
+const findEmptyLocation = (board, emptyCell) => {
   for (let i = 0; i < board.length; i++) {
     for (let j = 0; j < board[0].length; j++) {
       if (board[i][j].value == 0) {
@@ -70,25 +71,30 @@ const findEmptyLocation =  (board, emptyCell) => {
   return false;
 };
 const removeRepetative = (board, newRow, newCol, newMove) => {
-  //check cols
+  //update cols possibleMoves
   for (let i = 0; i < board.length; i++) {
+    //remove the newMove from all cols possibleMoves
     board[i][newCol].possibleValues = board[i][newCol].possibleValues.filter(
       (move) => move !== newMove
     );
     if (board[i][newCol].possibleValues.length == 0) {
+      //return the removed element incase of backtracking (there exist element without possibleMoves)
+      board[i][newCol].possibleValues.push(newMove);
       return false;
     }
   }
-  //check rows
+  //update rows
   for (let i = 0; i < board[0].length; i++) {
     board[newRow][i].possibleValues = board[newRow][i].possibleValues.filter(
       (move) => move !== newMove
     );
     if (board[newRow][i].possibleValues.length == 0) {
+      //return the removed element incase of backtracking
+      board[newRow][i].possibleValues.push(newMove);
       return false;
     }
   }
-  //check box
+  //update box
   let boxRow = Math.floor(newRow / 3) * 3;
   let boxCol = Math.floor(newCol / 3) * 3;
   for (let i = boxRow; i < boxRow + 3; i++) {
@@ -97,6 +103,8 @@ const removeRepetative = (board, newRow, newCol, newMove) => {
         (move) => move !== newMove
       );
       if (board[i][j].possibleValues.length == 0) {
+        //return the removed element incase of backtracking
+        board[i][j].possibleValues.push(newMove);
         return false;
       }
     }
@@ -104,44 +112,43 @@ const removeRepetative = (board, newRow, newCol, newMove) => {
   return true;
 };
 
-const solveSudoku =  async(board) => {
+function solveSudoku(board) {
   let emptyCell = { row: 0, col: 0 };
-  if (!( findEmptyLocation(board, emptyCell))) return true;
+  if (!findEmptyLocation(board, emptyCell)) return true;
   const newRow = emptyCell["row"];
   const newCol = emptyCell["col"];
   for (let i = 0; i < board[newRow][newCol].possibleValues.length; i++) {
     const newMove = board[newRow][newCol].possibleValues[i];
-    if ( isSafe(board, newRow, newCol, newMove)) {
+    if (isSafe(board, newRow, newCol, newMove)) {
       //if (removeRepetative(board, newRow, newCol, newMove)) {
-      board[newRow][newCol].value = newMove;
-      // Recursively attempt to solve the remaining puzzle
-      if (await solveSudoku(board)) {
-        return true; // Solution found, break out of the loop
-      }
-      board[newRow][newCol].value = 0;
-      // }
+        board[newRow][newCol].value = newMove;
+        // Recursively attempt to solve the remaining puzzle
+        if (solveSudoku(board)) {
+          return true; // Solution found, break out of the loop
+        }
+        board[newRow][newCol].value = 0;
+      //}
     }
   }
-  /* for (let i = 1; i < 10; i++) {
-    if (isSafe(board, newRow, newCol, i)) {
-      board[newRow][newCol].value = i;
-      if (solveSudoku(board)) {
-        return true;
-      }
-      board[newRow][newCol].value = 0;
-    }
-  } */
-
   // If no valid move leads to a solution, return false
   return false;
-};
+}
+
 const sudokuBoard = initializeBoard(9, 9);
 //displayBoard(sudokuBoard);
 displayBoard(sudokuBoard);
 const startTime = performance.now();
-await solveSudoku(sudokuBoard);
+solveSudoku(sudokuBoard);
 const endTime = performance.now();
 const runtime = endTime - startTime;
 console.log(`runtime: ${runtime}`);
 displayBoard(sudokuBoard);
-export { isSafe, solveSudoku, Cell };
+export {
+  isSafe,
+  initializeBoard,
+  displayBoard,
+  findEmptyLocation,
+  removeRepetative,
+  solveSudoku,
+  Cell,
+};
